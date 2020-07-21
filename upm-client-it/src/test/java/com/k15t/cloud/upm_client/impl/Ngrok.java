@@ -60,6 +60,7 @@ public class Ngrok {
 
     public void stop() {
         if (process != null) {
+            logger.info("Stopping ngrok");
             process.destroy();
         }
     }

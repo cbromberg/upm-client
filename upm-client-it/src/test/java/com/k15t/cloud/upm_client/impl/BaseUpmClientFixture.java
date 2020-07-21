@@ -1,7 +1,6 @@
 package com.k15t.cloud.upm_client.impl;
 
 import com.k15t.cloud.upm_client.UpmClient;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +15,7 @@ public class BaseUpmClientFixture {
 
 
     private static final Logger logger = LoggerFactory.getLogger(BaseUpmClientFixture.class);
+
 
     private static String toEnvironmentVariableName(String systemPropertyKey) {
         return Optional.ofNullable(systemPropertyKey)
@@ -58,11 +58,6 @@ public class BaseUpmClientFixture {
         Ngrok.getInstance().start();
         appUrl = Ngrok.getInstance().getPublicUrl();
         logger.info("Serving test app {} at {}{}", pluginKey, appUrl, descriptorPath);
-    }
-
-    @AfterAll
-    public static void shutDown() {
-        Ngrok.getInstance().stop();
     }
 
 
