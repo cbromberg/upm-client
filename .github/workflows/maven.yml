@@ -25,4 +25,4 @@ jobs:
       env:
         UPM_CLIENT_URL: https://upm-client.atlassian.net/wiki
         UPM_CLIENT_USERNAME: christoffer+upm-client@k15t.com
-        UPM_CLIENT_PASSWORD: 9OWImYTsu9UUmkpal16t2B8A
+        UPM_CLIENT_PASSWORD: ${{ secrets.UPM_CLIENT_PASSWORD }}
