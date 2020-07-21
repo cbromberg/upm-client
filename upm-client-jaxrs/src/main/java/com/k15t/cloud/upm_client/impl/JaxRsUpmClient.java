@@ -20,6 +20,7 @@ public class JaxRsUpmClient implements UpmClient {
 
     private final Client client;
     private final Authentication authentication;
+    private final long taskTimeout = Optional.ofNullable(System.getenv("UPM_CLIENT_INSTALL_TIMEOUT")).map(Long::parseLong).orElse(300000L);
 
 
     public JaxRsUpmClient(Client client, Authentication authentication) {
@@ -124,6 +125,7 @@ public class JaxRsUpmClient implements UpmClient {
      * "id":"80c47a3d-4911-4763-9382-2719331c182e"}
      */
     private void install(WebTarget upmEndpoint, String descriptorUrl) {
+        long start = System.currentTimeMillis();
         String response = upmEndpoint.request(UpmClient.CONTENT_TYPE_RESPONSE_SUCCESS)
                 .post(Entity.entity(String.format(UpmClient.INSTALL_JSON_PAYLOAD, descriptorUrl),
                         UpmClient.CONTENT_TYPE_INSTALL_JSON), String.class);
@@ -131,6 +133,9 @@ public class JaxRsUpmClient implements UpmClient {
         int waitForMilliseconds = UpmTaskUtil.getPollDelay(jsonObject);
         String link = UpmTaskUtil.getInstallTaskLink(jsonObject);
         do {
+            if (System.currentTimeMillis() - start > taskTimeout) {
+                throw new IllegalStateException(String.format("Timeout, installation took longer than %s ms", taskTimeout));
+            }
             UpmTaskUtil.waitFor(waitForMilliseconds);
             response = getTaskStatus(upmEndpoint, UpmTaskUtil.substringAfter(link, ENDPOINT_URL_PATH));
             jsonObject = new JSONObject(response);

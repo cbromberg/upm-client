@@ -1,19 +1,21 @@
 package com.k15t.cloud.upm_client.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.k15t.cloud.upm_client.UpmClient;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 
 
 public class BaseUpmClientFixture {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseUpmClientFixture.class);
+
 
     private static String toEnvironmentVariableName(String systemPropertyKey) {
         return Optional.ofNullable(systemPropertyKey)
@@ -27,43 +29,36 @@ public class BaseUpmClientFixture {
     }
 
 
+    private static String requireNonEmpty(String toCheck, String message) {
+        if (toCheck == null || toCheck.length() == 0) {
+            throw new IllegalArgumentException(message);
+        }
+        return toCheck;
+    }
+
+
     static final String USERNAME = "upm-client.username";
     static final String PASSWORD = "upm-client.password";
     static final String URL = "upm-client.url";
-    static final String publicUrl;
 
 
-    protected String hostProductUrl = getSystemPropertyOrEnvironmentVariable(URL);
+    protected String hostProductUrl = requireNonEmpty(getSystemPropertyOrEnvironmentVariable(URL), URL + " MUST NOT be empty");
     protected UpmClient.Authentication authentication = new UpmClient.Authentication(
-            getSystemPropertyOrEnvironmentVariable(USERNAME),
-            getSystemPropertyOrEnvironmentVariable(PASSWORD));
+            requireNonEmpty(getSystemPropertyOrEnvironmentVariable(USERNAME), USERNAME + " MUST NOT be empty"),
+            requireNonEmpty(getSystemPropertyOrEnvironmentVariable(PASSWORD), PASSWORD + " MUST NOT be empty"));
     protected Function<com.k15t.cloud.upm_client.UpmClient.Authentication, UpmClient> supplier;
     protected UpmClient upmClient;
     protected String pluginKey = "com.k15t.cloud.upm-client.testapp";
-    protected String appUrl = publicUrl;
+    protected String appUrl;
     protected String descriptorPath = "/atlassian-connect.json";
 
-    static final Process ngrok;
 
-    static {
-        try {
-            ngrok = Runtime.getRuntime().exec("./node_modules/.bin/ngrok http --bind-tls=true 8080");
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    super.run();
-                    ngrok.destroyForcibly();
-                }
-            });
-            WebTarget client = ClientBuilder.newClient().target("http://localhost:4040/api/tunnels/command_line");
-            JsonNode response = client.request("application/json").get(JsonNode.class);
-            publicUrl = response.get("public_url").asText();
-            
-        } catch (IOException e) {
-            throw new ExceptionInInitializerError(e);
-        }
+    @BeforeEach
+    public void setup() {
+        Ngrok.getInstance().start();
+        appUrl = Ngrok.getInstance().getPublicUrl();
+        logger.info("Serving test app {} at {}{}", pluginKey, appUrl, descriptorPath);
     }
-
 
 
     @Test
@@ -114,7 +109,6 @@ public class BaseUpmClientFixture {
         Assertions.assertFalse(upmClient.get(hostProductUrl, "upm-fake-test-id",
                 String.class).isPresent());
     }
-
 
 
 }
