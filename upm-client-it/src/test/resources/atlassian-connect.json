@@ -1,0 +1,20 @@
+{
+    "name": "UPM Client test app",
+    "description": "An empty app to test install and uninstall",
+    "key": "com.k15t.cloud.upm-client.testapp",
+    "scopes": [],
+    "baseUrl": "${{appBaseUrl}}",
+    "enableLicensing": false,
+    "vendor": {
+        "name": "K15t GmbH",
+        "url": "https://www.k15t.com"
+    },
+    "authentication": {
+        "type": "none"
+    },
+    "apiVersion": 2,
+    "appVersion": "1.0.0",
+    "apiMigrations": {
+        "gdpr": true
+    }
+}
