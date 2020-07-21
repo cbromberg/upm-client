@@ -1,6 +1,5 @@
-package com.k15t.cloud.upm_client.impl;
+package com.k15t.cloud.upm_client;
 
-import com.k15t.cloud.upm_client.UpmClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-public class BaseUpmClientFixture {
+class BaseUpmClientFixture {
 
 
     private static final Logger logger = LoggerFactory.getLogger(BaseUpmClientFixture.class);
@@ -62,20 +61,7 @@ public class BaseUpmClientFixture {
 
 
     @Test
-    public void list() {
-        upmClient.list(hostProductUrl, String.class);
-    }
-
-
-    @Test
-    public void listNoAuthentication() {
-        UpmClient noAuth = supplier.apply(null);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> noAuth.list(hostProductUrl, String.class));
-    }
-
-
-    @Test
-    public void remove() {
+    void remove() {
         if (!upmClient.get(hostProductUrl, pluginKey,
                 String.class).isPresent()) {
             upmClient.install(hostProductUrl, appUrl + descriptorPath);
@@ -87,7 +73,7 @@ public class BaseUpmClientFixture {
 
 
     @Test
-    public void install() {
+    void install() {
         if (upmClient.get(hostProductUrl, pluginKey,
                 String.class).isPresent()) {
             upmClient.uninstall(hostProductUrl, pluginKey);
@@ -101,7 +87,7 @@ public class BaseUpmClientFixture {
 
 
     @Test
-    public void get() {
+    void get() {
         Optional<String>
                 info = upmClient.get(hostProductUrl, "com.atlassian.confluence.plugins.confluence-collaborative-editor-plugin",
                 String.class);

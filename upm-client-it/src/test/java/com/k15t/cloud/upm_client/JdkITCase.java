@@ -1,7 +1,6 @@
 package com.k15t.cloud.upm_client;
 //
 //
-import com.k15t.cloud.upm_client.impl.BaseUpmClientFixture;
 import org.junit.jupiter.api.Disabled;
 
 

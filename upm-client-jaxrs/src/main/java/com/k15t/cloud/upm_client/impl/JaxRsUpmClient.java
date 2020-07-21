@@ -37,11 +37,10 @@ public class JaxRsUpmClient implements UpmClient {
     }
 
 
-    public void setLicenseToken(String productUrl, String appKey, String tokenValue, TokenState tokenState) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
-        String upmToken = getUpmToken(upmEndpoint);
-        
-    }
+//    public void setLicenseToken(String productUrl, String appKey, String tokenValue, TokenState tokenState) {
+//        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
+//        String upmToken = getUpmToken(upmEndpoint);
+//    }
 
 
     protected String getUpmUrl(String productUrl) {
@@ -53,13 +52,6 @@ public class JaxRsUpmClient implements UpmClient {
     public void uninstall(String productUrl, String appKey) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
         uninstall(upmEndpoint, requireNonBlank(appKey, "The appKey MUST not be null"));
-    }
-
-
-    @Override
-    public <T> T list(String productUrl, Class<T> type) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
-        return (T) upmEndpoint.request().get().readEntity(type);
     }
 
 
@@ -81,8 +73,8 @@ public class JaxRsUpmClient implements UpmClient {
     protected Response isExpectedStatusCodeOrThrow(Response response, int statusCode) {
         return Optional.of(response).filter(r -> r.getStatus() == statusCode)
                 .orElseThrow(() -> new WebApplicationException(
-                        String.format("Expected %s, but got %s: %s ", statusCode, response.getStatus(), response.readEntity(String.class),
-                                response)));
+                        String.format("Expected %s, but got %s: %s ", statusCode, response.getStatus(), response.readEntity(String.class)),
+                        response));
     }
 
 

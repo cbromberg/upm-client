@@ -2,7 +2,6 @@ package com.k15t.cloud.upm_client;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.k15t.cloud.upm_client.impl.BaseUpmClientFixture;
 import com.k15t.cloud.upm_client.impl.JaxRsUpmClient;
 import com.k15t.cloud.upm_client.testapp.UpmClientTestApp;
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +23,7 @@ public class JaxRsITCase extends BaseUpmClientFixture {
     }
 
     @Test
-    public void getJackson() {
+    void getJackson() {
         String appKey = "com.atlassian.confluence.plugins.confluence-collaborative-editor-plugin";
         Optional<JsonNode> info = upmClient.get(hostProductUrl, appKey, JsonNode.class);
         Assertions.assertTrue(info.isPresent());
