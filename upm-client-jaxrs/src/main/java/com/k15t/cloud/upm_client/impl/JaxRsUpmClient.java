@@ -79,7 +79,9 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     protected WebTarget applyAuthentication(WebTarget toAuthenticate) {
-        Optional.ofNullable(authentication).orElseThrow(() -> new IllegalArgumentException("No authentication given"));
+        if (this.authentication == null) {
+            throw new IllegalArgumentException("No authentication given");
+        }
         return toAuthenticate.register(
                 (ClientRequestFilter) requestContext -> requestContext.getHeaders()
                         .putSingle("Authorization", "Basic " + Base64.getEncoder()
