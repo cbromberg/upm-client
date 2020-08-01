@@ -18,3 +18,5 @@ upm-client-it/package-lock.json
 upm-client-it/upm-client-it.iml
 upm-client-jaxrs/upm-client-jaxrs.iml
 upm-client.iml
+local/
+

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Disabled;
 //
 //@SpringBootTest(classes = {UpmClientTestApp.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Disabled
-public class JdkITCase extends BaseUpmClientFixture {
+public class JdkTest extends BaseUpmClientFixture {
 //
 //
 //    {

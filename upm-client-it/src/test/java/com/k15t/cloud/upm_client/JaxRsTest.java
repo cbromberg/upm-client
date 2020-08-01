@@ -2,7 +2,7 @@ package com.k15t.cloud.upm_client;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.k15t.cloud.upm_client.impl.JaxRsUpmClient;
+import com.k15t.cloud.upm_client.jaxrs.JaxRsUpmClient;
 import com.k15t.cloud.upm_client.testapp.UpmClientTestApp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 
 @SpringBootTest(classes = {UpmClientTestApp.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class JaxRsITCase extends BaseUpmClientFixture {
+class JaxRsTest extends BaseUpmClientFixture {
 
 
     {

@@ -1,4 +1,4 @@
-package com.k15t.cloud.upm_client.impl;
+package com.k15t.cloud.upm_client.jaxrs;
 
 import com.k15t.cloud.upm_client.UpmClient;
 import com.k15t.cloud.upm_client.jdk.UpmTaskUtil;
