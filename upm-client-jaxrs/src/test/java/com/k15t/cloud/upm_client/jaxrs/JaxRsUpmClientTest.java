@@ -1,9 +1,10 @@
-package com.k15t.cloud.upm_client.impl;
+package com.k15t.cloud.upm_client.jaxrs;
 
 
-public class JaxRsUpmClientTest  {
+class JaxRsUpmClientTest  {
 
 
+    JaxRsUpmClient underTest;
 //    {
 //        upmClient = new JaxRsUpmClient(authentication);
 //    }

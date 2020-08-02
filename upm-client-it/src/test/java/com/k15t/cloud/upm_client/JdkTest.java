@@ -1,7 +1,6 @@
 package com.k15t.cloud.upm_client;
 //
 //
-import com.k15t.cloud.upm_client.impl.BaseUpmClientFixture;
 import org.junit.jupiter.api.Disabled;
 
 
@@ -12,7 +11,7 @@ import org.junit.jupiter.api.Disabled;
 //
 //@SpringBootTest(classes = {UpmClientTestApp.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Disabled
-public class JdkITCase extends BaseUpmClientFixture {
+public class JdkTest extends BaseUpmClientFixture {
 //
 //
 //    {

@@ -9,11 +9,15 @@ import java.util.Optional;
 public class UpmTaskUtil {
 
 
+    private UpmTaskUtil() {
+    }
+
+
     public static void waitFor(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
-            Thread.interrupted();
+            Thread.currentThread().interrupt();
         }
     }
 

@@ -1,4 +1,4 @@
-package com.k15t.cloud.upm_client.impl;
+package com.k15t.cloud.upm_client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;

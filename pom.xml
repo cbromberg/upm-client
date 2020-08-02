@@ -37,6 +37,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <junit.jupiter.version>5.6.2</junit.jupiter.version>
         <jersey.version>2.30.1</jersey.version>
+        <sonar.organization>cbromberg</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -56,11 +59,11 @@
                 <artifactId>upm-client-jaxrs</artifactId>
                 <version>${project.version}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>${project.groupId}</groupId>-->
-<!--                <artifactId>upm-client-jdk</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>${project.groupId}</groupId>-->
+            <!--                <artifactId>upm-client-jdk</artifactId>-->
+            <!--                <version>${project.version}</version>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
@@ -93,7 +96,32 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.5</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

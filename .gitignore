@@ -1,6 +1,3 @@
-/upm-client-jdk/
-/upm-client-it/node
-/upm-client-it/node_modules
 .idea/$CACHE_FILE$
 .idea/.gitignore
 .idea/compiler.xml
@@ -11,15 +8,15 @@
 .idea/modules.xml
 .idea/vcs.xml
 
-upm-client-api/target/
+/upm-client-jdk/
+target/
+node/
+node_modules/
 upm-client-api/upm-client-api.iml
-upm-client-common/target/
 upm-client-common/upm-client-common.iml
-upm-client-it/node/
-upm-client-it/node_modules/
 upm-client-it/package-lock.json
-upm-client-it/target/
 upm-client-it/upm-client-it.iml
-upm-client-jaxrs/target/
 upm-client-jaxrs/upm-client-jaxrs.iml
 upm-client.iml
+local/
+

@@ -91,9 +91,6 @@ public interface UpmClient {
     <T> Optional<T> get(String productUrl, String appKey, Class<T> type);
 
 
-    <T> T list(String productUrl, Class<T> type);
-
-
     // needs UPM token for posting
     // void setLicenseToken(String appKey, String tokenValue, TokenState tokenState);
 
