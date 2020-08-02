@@ -52,14 +52,17 @@ public class JaxRsUpmClient implements UpmClient {
     @Override
     public void uninstall(String appKey) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
-        uninstall(upmEndpoint, requireNonBlank(appKey, "The appKey MUST not be null"));
+        Response uninstallResponse = upmEndpoint.path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null")))
+                .request(UpmClient.CONTENT_TYPE_RESPONSE_SUCCESS)
+                .delete();
+        isExpectedStatusCodeOrThrow(uninstallResponse, Response.Status.NO_CONTENT.getStatusCode());
     }
 
 
     @Override
     public <T> Optional<T> get(String appKey, Class<T> type) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
-                .path(requireNonBlank(appKey, "The appKey MUST not be null.") + "-key");
+                .path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
         try {
             return Optional.of(upmEndpoint.request().get(type));
         } catch (WebApplicationException a) {
@@ -147,9 +150,7 @@ public class JaxRsUpmClient implements UpmClient {
     }
 
 
-    private void uninstall(WebTarget upmEndpoint, String appKey) {
-        Response uninstallResponse = upmEndpoint.path(appKey + "-key").request(UpmClient.CONTENT_TYPE_RESPONSE_SUCCESS)
-                .delete();
-        isExpectedStatusCodeOrThrow(uninstallResponse, Response.Status.NO_CONTENT.getStatusCode());
+    private String appKeyPathSegment(String appKey) {
+        return String.format("%s-key", appKey);
     }
 }
