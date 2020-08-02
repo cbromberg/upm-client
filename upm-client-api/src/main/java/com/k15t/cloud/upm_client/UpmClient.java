@@ -49,13 +49,13 @@ public interface UpmClient {
      * @param appUrl HTTPS URL pointing to a side-loaded app (i.e. not from MPAC)
      * @throws RuntimeException if anything goes wrong.
      */
-    void install(String productUrl, String appUrl);
+    void install(String appUrl);
 
 
     /**
      * Uninstalls the given app from the given product.
      */
-    void uninstall(String productUrl, String appKey);
+    void uninstall(String appKey);
 
 
     /**
@@ -88,11 +88,14 @@ public interface UpmClient {
      *
      * @return info about an app.
      */
-    <T> Optional<T> get(String productUrl, String appKey, Class<T> type);
+    <T> Optional<T> get(String appKey, Class<T> type);
 
 
-    // needs UPM token for posting
-    // void setLicenseToken(String appKey, String tokenValue, TokenState tokenState);
+    /**
+     * Set the token (private listing) and #TokenState of the token. Pass in a token value of null and state of null to delete the token.
+     */
+    void setLicenseToken(String appKey, String tokenValue, TokenState tokenState);
+
 
     /**
      * Authentication is applied to a UpmClient at construction time. You can create multiple clients for multiple targets.
@@ -100,13 +103,20 @@ public interface UpmClient {
      */
     final class Authentication {
 
+        private final String productUrl;
         private final String username;
         private final String apiToken;
 
 
-        public Authentication(String username, String apiToken) {
+        public Authentication(String productUrl, String username, String apiToken) {
+            this.productUrl = requireNonNull(productUrl);
             this.username = requireNonNull(username);
             this.apiToken = requireNonNull(apiToken);
+        }
+
+
+        public String getProductUrl() {
+            return productUrl;
         }
 
 

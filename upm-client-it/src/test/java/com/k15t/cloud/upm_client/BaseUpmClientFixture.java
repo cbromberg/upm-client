@@ -41,8 +41,7 @@ class BaseUpmClientFixture {
     static final String URL = "upm-client.url";
 
 
-    protected String hostProductUrl = requireNonEmpty(getSystemPropertyOrEnvironmentVariable(URL), URL + " MUST NOT be empty");
-    protected UpmClient.Authentication authentication = new UpmClient.Authentication(
+    protected UpmClient.Authentication authentication = new UpmClient.Authentication(requireNonEmpty(getSystemPropertyOrEnvironmentVariable(URL), URL + " MUST NOT be empty"),
             requireNonEmpty(getSystemPropertyOrEnvironmentVariable(USERNAME), USERNAME + " MUST NOT be empty"),
             requireNonEmpty(getSystemPropertyOrEnvironmentVariable(PASSWORD), PASSWORD + " MUST NOT be empty"));
     protected Function<com.k15t.cloud.upm_client.UpmClient.Authentication, UpmClient> supplier;
@@ -62,26 +61,26 @@ class BaseUpmClientFixture {
 
     @Test
     void remove() {
-        if (!upmClient.get(hostProductUrl, pluginKey,
+        if (!upmClient.get(pluginKey,
                 String.class).isPresent()) {
-            upmClient.install(hostProductUrl, appUrl + descriptorPath);
-            Assertions.assertTrue(upmClient.get(hostProductUrl, pluginKey, String.class).isPresent());
+            upmClient.install(appUrl + descriptorPath);
+            Assertions.assertTrue(upmClient.get(pluginKey, String.class).isPresent());
         }
-        upmClient.uninstall(hostProductUrl, pluginKey);
-        Assertions.assertFalse(upmClient.get(hostProductUrl, pluginKey, String.class).isPresent());
+        upmClient.uninstall(pluginKey);
+        Assertions.assertFalse(upmClient.get(pluginKey, String.class).isPresent());
     }
 
 
     @Test
     void install() {
-        if (upmClient.get(hostProductUrl, pluginKey,
+        if (upmClient.get(pluginKey,
                 String.class).isPresent()) {
-            upmClient.uninstall(hostProductUrl, pluginKey);
-            Assertions.assertFalse(upmClient.get(hostProductUrl, pluginKey,
+            upmClient.uninstall(pluginKey);
+            Assertions.assertFalse(upmClient.get(pluginKey,
                     String.class).isPresent());
         }
-        upmClient.install(hostProductUrl, appUrl + descriptorPath);
-        Assertions.assertTrue(upmClient.get(hostProductUrl, pluginKey,
+        upmClient.install(appUrl + descriptorPath);
+        Assertions.assertTrue(upmClient.get(pluginKey,
                 String.class).isPresent());
     }
 
@@ -89,10 +88,14 @@ class BaseUpmClientFixture {
     @Test
     void get() {
         Optional<String>
-                info = upmClient.get(hostProductUrl, "com.atlassian.confluence.plugins.confluence-collaborative-editor-plugin",
+                info = upmClient.get("com.atlassian.confluence.plugins.confluence-collaborative-editor-plugin",
                 String.class);
         Assertions.assertTrue(info.isPresent());
-        Assertions.assertFalse(upmClient.get(hostProductUrl, "upm-fake-test-id",
+    }
+
+    @Test
+    void getMissing() {
+        Assertions.assertFalse(upmClient.get("upm-fake-test-id",
                 String.class).isPresent());
     }
 

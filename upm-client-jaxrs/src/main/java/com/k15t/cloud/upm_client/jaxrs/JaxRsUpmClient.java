@@ -30,17 +30,18 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     @Override
-    public void install(String productUrl, String appUrl) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
+    public void install(String appUrl) {
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
         String upmToken = getUpmToken(upmEndpoint);
         install(upmEndpoint.queryParam(UpmClient.QUERY_PARAM_TOKEN, upmToken), appUrl);
     }
 
 
-//    public void setLicenseToken(String productUrl, String appKey, String tokenValue, TokenState tokenState) {
-//        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
-//        String upmToken = getUpmToken(upmEndpoint);
-//    }
+    @Override
+    public void setLicenseToken(String appKey, String tokenValue, TokenState tokenState) {
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
+        String upmToken = getUpmToken(upmEndpoint);
+    }
 
 
     protected String getUpmUrl(String productUrl) {
@@ -49,15 +50,15 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     @Override
-    public void uninstall(String productUrl, String appKey) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)));
+    public void uninstall(String appKey) {
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
         uninstall(upmEndpoint, requireNonBlank(appKey, "The appKey MUST not be null"));
     }
 
 
     @Override
-    public <T> Optional<T> get(String productUrl, String appKey, Class<T> type) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productUrl)))
+    public <T> Optional<T> get(String appKey, Class<T> type) {
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
                 .path(requireNonBlank(appKey, "The appKey MUST not be null.") + "-key");
         try {
             return Optional.of(upmEndpoint.request().get(type));
