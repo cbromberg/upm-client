@@ -25,7 +25,7 @@ class JaxRsTest extends BaseUpmClientFixture {
     @Test
     void getJackson() {
         String appKey = "com.atlassian.confluence.plugins.confluence-collaborative-editor-plugin";
-        Optional<JsonNode> info = upmClient.get(hostProductUrl, appKey, JsonNode.class);
+        Optional<JsonNode> info = upmClient.get(appKey, JsonNode.class);
         Assertions.assertTrue(info.isPresent());
         Assertions.assertEquals(info.get().get("key").asText(), appKey);
     }

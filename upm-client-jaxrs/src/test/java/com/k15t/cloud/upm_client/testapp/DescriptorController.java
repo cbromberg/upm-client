@@ -22,17 +22,17 @@ public class DescriptorController {
                             throw new RuntimeException(ioe);
                         }
                     })
-            .map(is -> {
-                try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
-                    return scanner.useDelimiter("\\A").next();
-                }
-            }).orElse("{}");
+                    .map(is -> {
+                        try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
+                            return scanner.useDelimiter("\\A").next();
+                        }
+                    }).orElse("{}");
 
-    @GetMapping(value = "atlassian-connect.json",
-            produces = "application/json")
+
+    @GetMapping(value = "atlassian-connect.json", produces = "application/json")
     public String descriptor() throws IOException {
-
-        return DESCRIPTOR_JSON.replace("${{appBaseUrl}}", "https://2c90d189d22f.eu.ngrok.io");
+        String ngrokUrl = System.getProperty("ngrok.public_url");
+        return DESCRIPTOR_JSON.replace("${{appBaseUrl}}", ngrokUrl);
     }
 
 }

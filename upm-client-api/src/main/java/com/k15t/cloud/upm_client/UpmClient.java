@@ -15,31 +15,6 @@ import static java.util.Objects.requireNonNull;
  */
 public interface UpmClient {
 
-    /**
-     * Name of the HTTP Header to transport a UPM token when doing a POST request.
-     */
-    String HEADER_TOKEN = "upm-token";
-    /**
-     * Name of the URL Query parameter to transport a UPM token when doing a POST request.
-     */
-    String QUERY_PARAM_TOKEN = "token";
-    String CONTENT_TYPE_INSTALL_JSON = "application/vnd.atl.plugins.remote.install+json";
-    String CONTENT_TYPE_RESPONSE_SUCCESS = "application/vnd.atl.plugins.installed+json";
-    String CONTENT_TYPE_ERROR = "application/vnd.atl.plugins.task.install.err+json";
-    /**
-     * The JSON body used to install a plugin.
-     */
-    String INSTALL_JSON_PAYLOAD = "{\"pluginUri\":\"%s\"}";
-    /**
-     * The JSON body used to set and change the state of a UPM license token (aka private listing).
-     */
-    String TOKEN_JSON_PAYLOAD = "{\"links\":{\"self\":\"/wiki/rest/plugins/1.0/license-tokens/%1$s-key\"},"
-            + "\"pluginKey\":\"%1$s\",\"token\":\"2$s\",\"state\":\"%3$s\",\"valid\":true}";
-    /**
-     * The URL path segments that lead to the UPM endpoint from the product base url.
-     */
-    String ENDPOINT_URL_PATH = "/rest/plugins/1.0/";
-
 
     /**
      * Installs the given app into the given product.
@@ -49,13 +24,13 @@ public interface UpmClient {
      * @param appUrl HTTPS URL pointing to a side-loaded app (i.e. not from MPAC)
      * @throws RuntimeException if anything goes wrong.
      */
-    void install(String productUrl, String appUrl);
+    void install(String appUrl);
 
 
     /**
      * Uninstalls the given app from the given product.
      */
-    void uninstall(String productUrl, String appKey);
+    void uninstall(String appKey);
 
 
     /**
@@ -88,11 +63,21 @@ public interface UpmClient {
      *
      * @return info about an app.
      */
-    <T> Optional<T> get(String productUrl, String appKey, Class<T> type);
+    <T> Optional<T> get(String appKey, Class<T> type);
 
 
-    // needs UPM token for posting
-    // void setLicenseToken(String appKey, String tokenValue, TokenState tokenState);
+    /**
+     * @see com.k15t.cloud.upm_client.json.UpmTokenResponse
+     */
+    <T> Optional<T> getLicenseToken(String appKey, Class<T> type);
+
+
+    /**
+     * Set the token (private listing) and #TokenState of the token. Pass in a token value of null and state of null to delete the token.
+     * @see com.k15t.cloud.upm_client.json.UpmTokenResponse
+     */
+    <T> T setLicenseToken(String appKey, String tokenValue, TokenState tokenState, Class<T> type);
+
 
     /**
      * Authentication is applied to a UpmClient at construction time. You can create multiple clients for multiple targets.
@@ -100,13 +85,20 @@ public interface UpmClient {
      */
     final class Authentication {
 
+        private final String productUrl;
         private final String username;
         private final String apiToken;
 
 
-        public Authentication(String username, String apiToken) {
+        public Authentication(String productUrl, String username, String apiToken) {
+            this.productUrl = requireNonNull(productUrl);
             this.username = requireNonNull(username);
             this.apiToken = requireNonNull(apiToken);
+        }
+
+
+        public String getProductUrl() {
+            return productUrl;
         }
 
 
@@ -121,14 +113,12 @@ public interface UpmClient {
     }
 
 
+    /**
+     * The state of a UPM license token / private listing.
+     */
     enum TokenState {
         NONE, ACTIVE_SUBSCRIPTION, ACTIVE_TRIAL, INACTIVE_TRIAL, ACTIVE_SUBSCRIPTION_CANCELLED, INACTIVE_SUBSCRIPTION
     }
 
 
-    final class ResponseCodes {
-
-        final String NOT_FROM_MARKETPLACE = "upm.pluginInstall.error.descriptor.not.from.marketplace";
-        final String INSTALL_EXCEPTION = "upm.pluginInstall.error.response.exception";
-    }
 }
