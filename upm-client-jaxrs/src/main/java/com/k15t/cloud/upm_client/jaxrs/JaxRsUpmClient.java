@@ -1,7 +1,8 @@
 package com.k15t.cloud.upm_client.jaxrs;
 
 import com.k15t.cloud.upm_client.UpmClient;
-import com.k15t.cloud.upm_client.jdk.UpmTaskUtil;
+import com.k15t.cloud.upm_client.UpmClientDetails;
+import com.k15t.cloud.upm_client.UpmTaskUtil;
 import org.json.JSONObject;
 
 import javax.ws.rs.WebApplicationException;
@@ -33,19 +34,29 @@ public class JaxRsUpmClient implements UpmClient {
     public void install(String appUrl) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
         String upmToken = getUpmToken(upmEndpoint);
-        install(upmEndpoint.queryParam(UpmClient.QUERY_PARAM_TOKEN, upmToken), appUrl);
+        install(upmEndpoint.queryParam(UpmClientDetails.QUERY_PARAM_TOKEN, upmToken), appUrl);
     }
 
 
     @Override
-    public void setLicenseToken(String appKey, String tokenValue, TokenState tokenState) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
-        String upmToken = getUpmToken(upmEndpoint);
+    public <T> T setLicenseToken(String appKey, String tokenValue, TokenState tokenState, Class<T> type) {
+        if (tokenValue == null && tokenState == null) {
+            applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
+                    .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")))
+                    .request()
+                    .delete(String.class);
+            return null;
+        }
+        T response = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())).path(UpmClientDetails.LICENSE_TOKEN_URL_PATH))
+                .request()
+                .post(Entity.entity(String.format(UpmClientDetails.TOKEN_JSON_PAYLOAD, appKey, tokenValue, tokenState.name()),
+                        UpmClientDetails.CONTENT_TYPE_INSTALL_TOKEN_JSON), type);
+        return response;
     }
 
 
     protected String getUpmUrl(String productUrl) {
-        return String.format("%s%s", productUrl, UpmClient.ENDPOINT_URL_PATH);
+        return String.format("%s%s", productUrl, UpmClientDetails.ENDPOINT_URL_PATH);
     }
 
 
@@ -53,7 +64,7 @@ public class JaxRsUpmClient implements UpmClient {
     public void uninstall(String appKey) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
         Response uninstallResponse = upmEndpoint.path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null")))
-                .request(UpmClient.CONTENT_TYPE_RESPONSE_SUCCESS)
+                .request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS)
                 .delete();
         isExpectedStatusCodeOrThrow(uninstallResponse, Response.Status.NO_CONTENT.getStatusCode());
     }
@@ -63,6 +74,21 @@ public class JaxRsUpmClient implements UpmClient {
     public <T> Optional<T> get(String appKey, Class<T> type) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
                 .path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
+        try {
+            return Optional.of(upmEndpoint.request().get(type));
+        } catch (WebApplicationException a) {
+            if (a.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                return Optional.empty();
+            }
+            throw a;
+        }
+    }
+
+
+    @Override
+    public <T> Optional<T> getLicenseToken(String appKey, Class<T> type) {
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
+                .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
         try {
             return Optional.of(upmEndpoint.request().get(type));
         } catch (WebApplicationException a) {
@@ -102,9 +128,9 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     private String getUpmToken(WebTarget upmEndpoint) {
-        Response tokenResponse = upmEndpoint.queryParam("os_authType", "basic").request(UpmClient.CONTENT_TYPE_RESPONSE_SUCCESS).head();
+        Response tokenResponse = upmEndpoint.queryParam("os_authType", "basic").request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS).head();
         isExpectedStatusCodeOrThrow(tokenResponse, Response.Status.OK.getStatusCode());
-        return requireNonBlank(tokenResponse.getHeaderString(UpmClient.HEADER_TOKEN), UpmClient.HEADER_TOKEN + " is not set on response.");
+        return requireNonBlank(tokenResponse.getHeaderString(UpmClientDetails.HEADER_TOKEN), UpmClientDetails.HEADER_TOKEN + " is not set on response.");
     }
 
 
@@ -124,9 +150,9 @@ public class JaxRsUpmClient implements UpmClient {
      */
     private void install(WebTarget upmEndpoint, String descriptorUrl) {
         long start = System.currentTimeMillis();
-        String response = upmEndpoint.request(UpmClient.CONTENT_TYPE_RESPONSE_SUCCESS)
-                .post(Entity.entity(String.format(UpmClient.INSTALL_JSON_PAYLOAD, descriptorUrl),
-                        UpmClient.CONTENT_TYPE_INSTALL_JSON), String.class);
+        String response = upmEndpoint.request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS)
+                .post(Entity.entity(String.format(UpmClientDetails.INSTALL_JSON_PAYLOAD, descriptorUrl),
+                        UpmClientDetails.CONTENT_TYPE_INSTALL_JSON), String.class);
         JSONObject jsonObject = new JSONObject(response);
         int waitForMilliseconds = UpmTaskUtil.getPollDelay(jsonObject);
         String link = UpmTaskUtil.getInstallTaskLink(jsonObject);
@@ -135,7 +161,7 @@ public class JaxRsUpmClient implements UpmClient {
                 throw new IllegalStateException(String.format("Timeout, installation took longer than %s ms", taskTimeout));
             }
             UpmTaskUtil.waitFor(waitForMilliseconds);
-            response = getTaskStatus(upmEndpoint, UpmTaskUtil.substringAfter(link, ENDPOINT_URL_PATH));
+            response = getTaskStatus(upmEndpoint, UpmTaskUtil.substringAfter(link, UpmClientDetails.ENDPOINT_URL_PATH));
             jsonObject = new JSONObject(response);
             waitForMilliseconds = UpmTaskUtil.getPollDelay(jsonObject);
         } while (!UpmTaskUtil.getTaskDone(jsonObject));

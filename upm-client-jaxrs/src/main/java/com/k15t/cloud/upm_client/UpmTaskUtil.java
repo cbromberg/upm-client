@@ -1,4 +1,4 @@
-package com.k15t.cloud.upm_client.jdk;
+package com.k15t.cloud.upm_client;
 
 
 import org.json.JSONObject;

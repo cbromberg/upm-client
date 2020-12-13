@@ -15,31 +15,6 @@ import static java.util.Objects.requireNonNull;
  */
 public interface UpmClient {
 
-    /**
-     * Name of the HTTP Header to transport a UPM token when doing a POST request.
-     */
-    String HEADER_TOKEN = "upm-token";
-    /**
-     * Name of the URL Query parameter to transport a UPM token when doing a POST request.
-     */
-    String QUERY_PARAM_TOKEN = "token";
-    String CONTENT_TYPE_INSTALL_JSON = "application/vnd.atl.plugins.remote.install+json";
-    String CONTENT_TYPE_RESPONSE_SUCCESS = "application/vnd.atl.plugins.installed+json";
-    String CONTENT_TYPE_ERROR = "application/vnd.atl.plugins.task.install.err+json";
-    /**
-     * The JSON body used to install a plugin.
-     */
-    String INSTALL_JSON_PAYLOAD = "{\"pluginUri\":\"%s\"}";
-    /**
-     * The JSON body used to set and change the state of a UPM license token (aka private listing).
-     */
-    String TOKEN_JSON_PAYLOAD = "{\"links\":{\"self\":\"/wiki/rest/plugins/1.0/license-tokens/%1$s-key\"},"
-            + "\"pluginKey\":\"%1$s\",\"token\":\"2$s\",\"state\":\"%3$s\",\"valid\":true}";
-    /**
-     * The URL path segments that lead to the UPM endpoint from the product base url.
-     */
-    String ENDPOINT_URL_PATH = "/rest/plugins/1.0/";
-
 
     /**
      * Installs the given app into the given product.
@@ -92,9 +67,16 @@ public interface UpmClient {
 
 
     /**
-     * Set the token (private listing) and #TokenState of the token. Pass in a token value of null and state of null to delete the token.
+     * @see com.k15t.cloud.upm_client.json.UpmTokenResponse
      */
-    void setLicenseToken(String appKey, String tokenValue, TokenState tokenState);
+    <T> Optional<T> getLicenseToken(String appKey, Class<T> type);
+
+
+    /**
+     * Set the token (private listing) and #TokenState of the token. Pass in a token value of null and state of null to delete the token.
+     * @see com.k15t.cloud.upm_client.json.UpmTokenResponse
+     */
+    <T> T setLicenseToken(String appKey, String tokenValue, TokenState tokenState, Class<T> type);
 
 
     /**
@@ -136,9 +118,4 @@ public interface UpmClient {
     }
 
 
-    final class ResponseCodes {
-
-        final String NOT_FROM_MARKETPLACE = "upm.pluginInstall.error.descriptor.not.from.marketplace";
-        final String INSTALL_EXCEPTION = "upm.pluginInstall.error.response.exception";
-    }
 }

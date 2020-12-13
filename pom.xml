@@ -10,9 +10,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <modules>
         <module>upm-client-api</module>
-        <module>upm-client-common</module>
         <module>upm-client-jaxrs</module>
-        <!--        <module>upm-client-jdk</module>-->
         <module>upm-client-it</module>
     </modules>
 
