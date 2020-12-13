@@ -47,11 +47,10 @@ public class JaxRsUpmClient implements UpmClient {
                     .delete(String.class);
             return null;
         }
-        T response = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())).path(UpmClientDetails.LICENSE_TOKEN_URL_PATH))
+        return applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())).path(UpmClientDetails.LICENSE_TOKEN_URL_PATH))
                 .request()
                 .post(Entity.entity(String.format(UpmClientDetails.TOKEN_JSON_PAYLOAD, appKey, tokenValue, tokenState.name()),
                         UpmClientDetails.CONTENT_TYPE_INSTALL_TOKEN_JSON), type);
-        return response;
     }
 
 
@@ -165,7 +164,9 @@ public class JaxRsUpmClient implements UpmClient {
             jsonObject = new JSONObject(response);
             waitForMilliseconds = UpmTaskUtil.getPollDelay(jsonObject);
         } while (!UpmTaskUtil.getTaskDone(jsonObject));
-        UpmTaskUtil.getErrorCode(jsonObject).ifPresent(IllegalStateException::new);
+        UpmTaskUtil.getErrorCode(jsonObject).ifPresent((json) -> {
+            throw new IllegalStateException();
+        });
     }
 
 

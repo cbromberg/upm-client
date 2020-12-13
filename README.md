@@ -1,3 +1,5 @@
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=com.k15t.cloud%3Aupm-client)
+
 # upm-client
 
 A java library to install an Atlassian Connect cloud app to an Atlassian Cloud product (Confluence/Jira) for development/testing.

@@ -113,6 +113,9 @@ public interface UpmClient {
     }
 
 
+    /**
+     * The state of a UPM license token / private listing.
+     */
     enum TokenState {
         NONE, ACTIVE_SUBSCRIPTION, ACTIVE_TRIAL, INACTIVE_TRIAL, ACTIVE_SUBSCRIPTION_CANCELLED, INACTIVE_SUBSCRIPTION
     }

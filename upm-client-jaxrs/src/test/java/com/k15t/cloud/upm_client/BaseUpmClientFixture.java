@@ -61,6 +61,7 @@ class BaseUpmClientFixture {
     public void setup() {
         Ngrok.getInstance().start();
         appUrl = Ngrok.getInstance().getPublicUrl();
+        System.setProperty("ngrok.public_url", appUrl);
         logger.info("Serving test app {} at {}{}", pluginKey, appUrl, descriptorPath);
     }
 
@@ -114,7 +115,8 @@ class BaseUpmClientFixture {
         UpmTokenResponse mpacTokenResponse =
                 upmClient.setLicenseToken(mpacAppKey, token, state, UpmTokenResponse.class);
         assertEquals(state, mpacTokenResponse.getState());
-        UpmTokenResponse getTokenResponse = upmClient.getLicenseToken(mpacAppKey, UpmTokenResponse.class).get();
+        UpmTokenResponse getTokenResponse =
+                upmClient.getLicenseToken(mpacAppKey, UpmTokenResponse.class).orElseThrow(IllegalStateException::new);
         assertEquals(state, getTokenResponse.getState());
     }
 

@@ -1,4 +1,7 @@
-package com.k15t.cloud.upm_client.jaxrs;
+package com.k15t.cloud.upm_client;
+
+
+import com.k15t.cloud.upm_client.jaxrs.JaxRsUpmClient;
 
 
 class JaxRsUpmClientTest  {
