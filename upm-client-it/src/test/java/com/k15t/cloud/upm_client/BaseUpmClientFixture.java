@@ -33,10 +33,7 @@ class BaseUpmClientFixture {
 
 
     private static String requireNonEmpty(String toCheck, String message) {
-        if (toCheck == null || toCheck.length() == 0) {
-            throw new IllegalArgumentException(message);
-        }
-        return toCheck;
+        return Optional.ofNullable(toCheck).filter(str -> str.length() > 0).orElseThrow(() -> new IllegalArgumentException(message));
     }
 
 
@@ -70,8 +67,7 @@ class BaseUpmClientFixture {
 
     @Test
     void remove() {
-        if (!upmClient.get(pluginKey,
-                String.class).isPresent()) {
+        if (!upmClient.get(pluginKey, String.class).isPresent()) {
             upmClient.install(appUrl + descriptorPath);
             Assertions.assertTrue(upmClient.get(pluginKey, String.class).isPresent());
         }
@@ -121,6 +117,7 @@ class BaseUpmClientFixture {
         UpmTokenResponse getTokenResponse = upmClient.getLicenseToken(mpacAppKey, UpmTokenResponse.class).get();
         assertEquals(state, getTokenResponse.getState());
     }
+
 
     @Test
     void deleteToken() {
