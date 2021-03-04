@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 
 class BaseUpmClientFixture {
@@ -41,7 +40,7 @@ class BaseUpmClientFixture {
             new UpmClient.ProductAccess(requireNonEmpty(getSystemPropertyOrEnvironmentVariable(URL), URL + " MUST NOT be empty"),
                     requireNonEmpty(getSystemPropertyOrEnvironmentVariable(USERNAME), USERNAME + " MUST NOT be empty"),
                     requireNonEmpty(getSystemPropertyOrEnvironmentVariable(PASSWORD), PASSWORD + " MUST NOT be empty"));
-    protected Function<UpmClient.ProductAccess, UpmClient> supplier;
+    //protected Function<UpmClient.ProductAccess, UpmClient> accessFunction;
     protected String token = requireNonEmpty(getSystemPropertyOrEnvironmentVariable(LICENSE_TOKEN), LICENSE_TOKEN + " MUST NOT be empty");
     protected UpmClient upmClient;
     protected String pluginKey = "com.k15t.cloud.upm-client.testapp";

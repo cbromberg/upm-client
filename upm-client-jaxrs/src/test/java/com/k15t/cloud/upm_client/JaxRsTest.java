@@ -22,8 +22,7 @@ class JaxRsTest extends BaseUpmClientFixture {
 
 
     {
-        supplier = (authentication1) -> new JaxRsUpmClient(ClientBuilder.newClient(), authentication1);
-        upmClient = supplier.apply(productAccess);
+        upmClient = new JaxRsUpmClient(ClientBuilder.newClient(), productAccess);
     }
 
     @Test
@@ -92,6 +91,21 @@ class JaxRsTest extends BaseUpmClientFixture {
 
     @Test
     void deleteToken() {
+        if (!upmClient.get(mpacAppKey,
+                String.class).isPresent()) {
+            upmClient.install(mpacAppUrl + descriptorPath);
+        }
+        if (!upmClient.getLicenseToken(mpacAppKey,
+                String.class).isPresent()) {
+            upmClient.setLicenseToken(mpacAppKey, token, UpmClient.TokenState.ACTIVE_TRIAL, UpmTokenResponse.class);
+        }
+        upmClient.removeLicenseToken(mpacAppKey);
+        Assertions.assertFalse(upmClient.getLicenseToken(mpacAppKey, UpmTokenResponse.class).isPresent());
+    }
+
+
+    @Test
+    void uninstallInspiteOfPresentToken() {
         if (!upmClient.get(mpacAppKey,
                 String.class).isPresent()) {
             upmClient.install(mpacAppUrl + descriptorPath);

@@ -23,8 +23,8 @@
     </organization>
 
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/K15t/k15t-master-pom.git</connection>
-        <url>https://bitbucket.org/K15t/k15t-master-pom</url>
+        <connection>scm:git:ssh://git@github.com:cbromberg/upm-client.git</connection>
+        <url>https://bitbucket.org/cbromberg/upm-client</url>
         <tag>HEAD</tag>
     </scm>
 
