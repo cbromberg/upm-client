@@ -22,8 +22,27 @@
         <url>https://www.k15t.com/</url>
     </organization>
 
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>K15t Releases</name>
+            <url>
+                https://nexus.k15t.com/content/repositories/releases/
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>K15t Snapshots</name>
+            <url>
+                https://nexus.k15t.com/content/repositories/snapshots/
+            </url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
     <scm>
-        <connection>scm:git:ssh://git@github.com:cbromberg/upm-client.git</connection>
+        <connection>scm:git:git://github.com/cbromberg/upm-client.git</connection>
         <url>https://bitbucket.org/cbromberg/upm-client</url>
         <tag>HEAD</tag>
     </scm>
