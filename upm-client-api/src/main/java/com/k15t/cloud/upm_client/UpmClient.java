@@ -67,30 +67,37 @@ public interface UpmClient {
 
 
     /**
+     * Retrieve the value of the current license token / private listing for the given appKey.
      * @see com.k15t.cloud.upm_client.json.UpmTokenResponse
      */
     <T> Optional<T> getLicenseToken(String appKey, Class<T> type);
 
 
     /**
-     * Set the token (private listing) and #TokenState of the token. Pass in a token value of null and state of null to delete the token.
+     * Set the token (private listing) and #TokenState of the token.
      * @see com.k15t.cloud.upm_client.json.UpmTokenResponse
      */
     <T> T setLicenseToken(String appKey, String tokenValue, TokenState tokenState, Class<T> type);
 
 
     /**
-     * Authentication is applied to a UpmClient at construction time. You can create multiple clients for multiple targets.
+     * Removes the license token / private listing for the given appKey.
+     */
+    void removeLicenseToken(String appKey);
+
+
+    /**
+     * ProductAccess is applied to a UpmClient at construction time. You can create multiple clients for multiple targets.
      * Implementations must make sure that authentication does not change the internal state of a passed in dependency (e.g. Client).
      */
-    final class Authentication {
+    final class ProductAccess {
 
         private final String productUrl;
         private final String username;
         private final String apiToken;
 
 
-        public Authentication(String productUrl, String username, String apiToken) {
+        public ProductAccess(String productUrl, String username, String apiToken) {
             this.productUrl = requireNonNull(productUrl);
             this.username = requireNonNull(username);
             this.apiToken = requireNonNull(apiToken);

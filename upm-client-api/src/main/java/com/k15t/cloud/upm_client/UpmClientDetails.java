@@ -39,11 +39,17 @@ public interface UpmClientDetails {
 
     String LICENSE_TOKEN_URL_PATH = "license-tokens";
 
+    /**
+     * Description of some known response codes.
+     */
     final class ResponseCodes {
 
-        final String NOT_FROM_MARKETPLACE = "upm.pluginInstall.error.descriptor.not.from.marketplace";
-        final String INSTALL_EXCEPTION = "upm.pluginInstall.error.response.exception";
-        final String TOKEN_INVALID = "upm.license.token.invalid.error";
-        final String UNINSTALLABLE = "upm.pluginUninstall.error.plugin.not.uninstallable";
+        public static final String NOT_FROM_MARKETPLACE = "upm.pluginInstall.error.descriptor.not.from.marketplace";
+        public static final String INSTALL_EXCEPTION = "upm.pluginInstall.error.response.exception";
+        public static final String TOKEN_INVALID = "upm.license.token.invalid.error";
+        /**
+         * When you try to uninstall an app that has a license token set. Remove the license token first.
+         */
+        public static final String UNINSTALLABLE = "upm.pluginUninstall.error.plugin.not.uninstallable";
     }
 }
