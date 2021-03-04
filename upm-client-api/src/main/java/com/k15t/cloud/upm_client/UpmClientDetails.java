@@ -39,11 +39,14 @@ public interface UpmClientDetails {
 
     String LICENSE_TOKEN_URL_PATH = "license-tokens";
 
+    /**
+     * Description of some known response codes.
+     */
     final class ResponseCodes {
 
-        final String NOT_FROM_MARKETPLACE = "upm.pluginInstall.error.descriptor.not.from.marketplace";
-        final String INSTALL_EXCEPTION = "upm.pluginInstall.error.response.exception";
-        final String TOKEN_INVALID = "upm.license.token.invalid.error";
-        final String UNINSTALLABLE = "upm.pluginUninstall.error.plugin.not.uninstallable";
+        static final String NOT_FROM_MARKETPLACE = "upm.pluginInstall.error.descriptor.not.from.marketplace";
+        static final String INSTALL_EXCEPTION = "upm.pluginInstall.error.response.exception";
+        static final String TOKEN_INVALID = "upm.license.token.invalid.error";
+        static final String UNINSTALLABLE = "upm.pluginUninstall.error.plugin.not.uninstallable";
     }
 }

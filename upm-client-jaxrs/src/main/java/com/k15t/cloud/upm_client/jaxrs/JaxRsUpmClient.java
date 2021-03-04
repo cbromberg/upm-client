@@ -20,19 +20,19 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     private final Client client;
-    private final Authentication authentication;
+    private final ProductAccess productAccess;
     private final long taskTimeout = Optional.ofNullable(System.getenv("UPM_CLIENT_INSTALL_TIMEOUT")).map(Long::parseLong).orElse(300000L);
 
 
-    public JaxRsUpmClient(Client client, Authentication authentication) {
+    public JaxRsUpmClient(Client client, ProductAccess productAccess) {
         this.client = client;
-        this.authentication = authentication;
+        this.productAccess = productAccess;
     }
 
 
     @Override
     public void install(String appUrl) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())));
         String upmToken = getUpmToken(upmEndpoint);
         install(upmEndpoint.queryParam(UpmClientDetails.QUERY_PARAM_TOKEN, upmToken), appUrl);
     }
@@ -40,17 +40,19 @@ public class JaxRsUpmClient implements UpmClient {
 
     @Override
     public <T> T setLicenseToken(String appKey, String tokenValue, TokenState tokenState, Class<T> type) {
-        if (tokenValue == null && tokenState == null) {
-            applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
-                    .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")))
-                    .request()
-                    .delete(String.class);
-            return null;
-        }
-        return applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())).path(UpmClientDetails.LICENSE_TOKEN_URL_PATH))
+        return applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())).path(UpmClientDetails.LICENSE_TOKEN_URL_PATH))
                 .request()
                 .post(Entity.entity(String.format(UpmClientDetails.TOKEN_JSON_PAYLOAD, appKey, tokenValue, tokenState.name()),
                         UpmClientDetails.CONTENT_TYPE_INSTALL_TOKEN_JSON), type);
+    }
+
+
+    @Override
+    public void removeLicenseToken(String appKey) {
+        applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())))
+                .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")))
+                .request()
+                .delete(String.class);
     }
 
 
@@ -61,7 +63,7 @@ public class JaxRsUpmClient implements UpmClient {
 
     @Override
     public void uninstall(String appKey) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())));
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())));
         Response uninstallResponse = upmEndpoint.path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null")))
                 .request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS)
                 .delete();
@@ -71,7 +73,7 @@ public class JaxRsUpmClient implements UpmClient {
 
     @Override
     public <T> Optional<T> get(String appKey, Class<T> type) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())))
                 .path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
         try {
             return Optional.of(upmEndpoint.request().get(type));
@@ -86,7 +88,7 @@ public class JaxRsUpmClient implements UpmClient {
 
     @Override
     public <T> Optional<T> getLicenseToken(String appKey, Class<T> type) {
-        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(authentication.getProductUrl())))
+        WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())))
                 .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
         try {
             return Optional.of(upmEndpoint.request().get(type));
@@ -108,13 +110,13 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     protected WebTarget applyAuthentication(WebTarget toAuthenticate) {
-        if (this.authentication == null) {
-            throw new IllegalArgumentException("No authentication given");
+        if (this.productAccess == null) {
+            throw new IllegalArgumentException("No productAccess given");
         }
         return toAuthenticate.register(
                 (ClientRequestFilter) requestContext -> requestContext.getHeaders()
                         .putSingle("Authorization", "Basic " + Base64.getEncoder()
-                                .encodeToString((this.authentication.getUsername() + ":" + this.authentication.getApiToken()).getBytes())));
+                                .encodeToString((this.productAccess.getUsername() + ":" + this.productAccess.getApiToken()).getBytes())));
     }
 
 

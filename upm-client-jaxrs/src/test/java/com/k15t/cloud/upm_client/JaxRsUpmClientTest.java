@@ -9,7 +9,7 @@ class JaxRsUpmClientTest  {
 
     JaxRsUpmClient underTest;
 //    {
-//        upmClient = new JaxRsUpmClient(authentication);
+//        upmClient = new JaxRsUpmClient(productAccess);
 //    }
 //
 //
@@ -26,7 +26,7 @@ class JaxRsUpmClientTest  {
 //    @Test
 //    public void listMethodAuthentiction() {
 //        String list = new JaxRsUpmClient(null).list(
-//                hostProductUrl, authentication, String.class);
+//                hostProductUrl, productAccess, String.class);
 //
 //    }
 //
