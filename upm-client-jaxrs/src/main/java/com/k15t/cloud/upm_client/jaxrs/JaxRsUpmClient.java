@@ -50,7 +50,8 @@ public class JaxRsUpmClient implements UpmClient {
     @Override
     public void removeLicenseToken(String appKey) {
         applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())))
-                .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")))
+                .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH)
+                .path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")))
                 .request()
                 .delete(String.class);
     }
@@ -67,7 +68,22 @@ public class JaxRsUpmClient implements UpmClient {
         Response uninstallResponse = upmEndpoint.path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null")))
                 .request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS)
                 .delete();
-        isExpectedStatusCodeOrThrow(uninstallResponse, Response.Status.NO_CONTENT.getStatusCode());
+        Optional<WebApplicationException> error =
+                getExceptionIfNotExpectedStatusCode(uninstallResponse, Response.Status.NO_CONTENT.getStatusCode());
+        if (error.isPresent()) {
+            if (error.get().getResponse().getStatus() == 403 && error.get().getMessage()
+                    .contains(UpmClientDetails.ResponseCodes.UNINSTALLABLE)) {
+                removeLicenseToken(appKey);
+                uninstallResponse = upmEndpoint.path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null")))
+                        .request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS)
+                        .delete();
+                getExceptionIfNotExpectedStatusCode(uninstallResponse, Response.Status.NO_CONTENT.getStatusCode()).ifPresent(e -> {
+                    throw e;
+                });
+            } else {
+                throw error.get();
+            }
+        }
     }
 
 
@@ -89,7 +105,8 @@ public class JaxRsUpmClient implements UpmClient {
     @Override
     public <T> Optional<T> getLicenseToken(String appKey, Class<T> type) {
         WebTarget upmEndpoint = applyAuthentication(client.target(getUpmUrl(productAccess.getProductUrl())))
-                .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH).path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
+                .path(UpmClientDetails.LICENSE_TOKEN_URL_PATH)
+                .path(appKeyPathSegment(requireNonBlank(appKey, "The appKey MUST not be null.")));
         try {
             return Optional.of(upmEndpoint.request().get(type));
         } catch (WebApplicationException a) {
@@ -101,9 +118,9 @@ public class JaxRsUpmClient implements UpmClient {
     }
 
 
-    protected Response isExpectedStatusCodeOrThrow(Response response, int statusCode) {
-        return Optional.of(response).filter(r -> r.getStatus() == statusCode)
-                .orElseThrow(() -> new WebApplicationException(
+    protected Optional<WebApplicationException> getExceptionIfNotExpectedStatusCode(Response response, int statusCode) {
+        return Optional.of(response).filter(r -> r.getStatus() != statusCode)
+                .map(response1 -> new WebApplicationException(
                         String.format("Expected %s, but got %s: %s ", statusCode, response.getStatus(), response.readEntity(String.class)),
                         response));
     }
@@ -129,9 +146,13 @@ public class JaxRsUpmClient implements UpmClient {
 
 
     private String getUpmToken(WebTarget upmEndpoint) {
-        Response tokenResponse = upmEndpoint.queryParam("os_authType", "basic").request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS).head();
-        isExpectedStatusCodeOrThrow(tokenResponse, Response.Status.OK.getStatusCode());
-        return requireNonBlank(tokenResponse.getHeaderString(UpmClientDetails.HEADER_TOKEN), UpmClientDetails.HEADER_TOKEN + " is not set on response.");
+        Response tokenResponse =
+                upmEndpoint.queryParam("os_authType", "basic").request(UpmClientDetails.CONTENT_TYPE_RESPONSE_SUCCESS).head();
+        getExceptionIfNotExpectedStatusCode(tokenResponse, Response.Status.OK.getStatusCode()).ifPresent(e -> {
+            throw e;
+        });
+        return requireNonBlank(tokenResponse.getHeaderString(UpmClientDetails.HEADER_TOKEN),
+                UpmClientDetails.HEADER_TOKEN + " is not set on response.");
     }
 
 
