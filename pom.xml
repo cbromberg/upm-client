@@ -7,7 +7,7 @@
     <groupId>com.k15t.cloud</groupId>
     <artifactId>upm-client</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <modules>
         <module>upm-client-api</module>
         <module>upm-client-jaxrs</module>
